@@ -92,6 +92,13 @@ void reset_arm(){
 	disable_servos();
 }
 
+matrix* getAMatrix(int rows, int columns)
+{
+	matrix* mat = (matrix*)calloc(1, sizeof(mat));
+	mat->rows = rows;
+	mat->columns = columns;
+	return mat;
+}
 int main()
 {
 	float theta = PI / 2.0;
