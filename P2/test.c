@@ -99,6 +99,7 @@ matrix* getAMatrix(int rows, int columns)
 	mat->columns = columns;
 	return mat;
 }
+
 int main()
 {
 	float theta = PI / 2.0;
