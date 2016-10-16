@@ -12,91 +12,16 @@ typedef struct{
 	float** data;
 } matrix;
 
+void reset_arm();
+int myround(float f);
+float angleto(matrix* B);
+float distanceto(matrix* B);
+void printArray(matrix* mat);
+float angleBetween(matrix* A, matrix* B);
+matrix* getAMatrix(int rows, int columns);
+float distancebetween(matrix* A, matrix* B);
+matrix* matrix_mult(matrix* matA, matrix* matB);
 matrix* frameTranslationRotationZAxis(float theta, matrix* origin, matrix* destG);
-
-matrix* getAMatrix(int rows, int columns)
-{
-	int i;
-	matrix* mat = (matrix*)calloc(1, sizeof(mat));
-	mat->rows = rows;
-	mat->columns = columns;
-	mat->data = (float**)calloc(rows, sizeof(float*));
-	for(i = 0; i < rows; i++)
-	{
-		mat->data[i] = (float*)calloc(columns, sizeof(float));
-	}
-	return mat;
-}
-
-void printArray(matrix* mat)
-{
-
-	int i, j;
-	for(i = 0; i < mat->rows; i++)
-	{
-		for(j = 0; j < mat->columns; j++)
-		{
-			printf("%f ", mat->data[i][j] );
-		}
-		printf("\n");
-	}
-}
-
-int myround(float f)
-{
-	return (f >= 0) ? (int)(f + 0.5) : (int)(f - 0.5);
-}
-
-matrix* matrix_mult(matrix* matA, matrix* matB)
-{
-		int i, j, k;
-    matrix* c = getAMatrix(mata->rows, matB->columns);
-    for (i = 0; i < matA->rows; i++)
-    {
-        for (k = 0; k < matB->columns; k++)
-        {
-            for (j = 0; j < matA->columns; j++)
-            {
-                c->data[i][k] += (matA->data[i][j]) * (matB->data[j][k]);
-            }
-        }
-    }
-
-    return c;
-}
-
-float distancebetween(matrix* A, matrix* B) // from A to B (2D)
-{
-	float diffX = (B->data[0][B->columns - 1] - A->data[0][A->columns - 1]);
-	float diffY = (B->data[1][B->columns - 1] - A->data[1][A->columns - 1]);
-	return sqrt((diffX * diffX) + (diffY * diffY));
-}
-
-float distanceto(matrix* B) // from origin to B (2D)
-{
-	return sqrt((B->data[0][B->columns - 1] * B->data[0][B->columns - 1])
-						+ (B->data[1][B->columns - 1] * B->data[1][B->columns - 1]));
-}
-
-float angleto(matrix* B) // from origin to B (2D)
-{
-	return atan2(B->data[1][B->columns - 1], B->data[0][B->columns]) * (180 / PI);
-}
-
-float angleBetween(matrix* A, matrix* B) // from A to B (2D)
-{
-	float diffX = (B->data[0][B->columns - 1] - A->data[0][A->columns - 1]);
-	float diffY = (B->data[1][B->columns - 1] - A->data[1][A->columns - 1]);
-	return atan2(diffY, diffX) * (180 / PI);
-}
-
-void reset_arm(){
-	enable_servos();
-	set_servo_position(0, 230); //lower number moves up from shoulder
-	set_servo_position(3, 1700); //higher number moves up from elbow
-	sleep(1.0);
-	disable_servos();
-}
 
 int main()
 {
@@ -179,4 +104,89 @@ matrix* frameTranslationRotationZAxis(float theta, matrix* origin, matrix* destG
 	rOOP->data[3][3] = origin->data[3][0]; // (4, 4)
 
 	return matrix_mult(tOD, rOOP);
+ }
+
+ matrix* getAMatrix(int rows, int columns)
+ {
+ 	int i;
+ 	matrix* mat = (matrix*)calloc(1, sizeof(mat));
+ 	mat->rows = rows;
+ 	mat->columns = columns;
+ 	mat->data = (float**)calloc(rows, sizeof(float*));
+ 	for(i = 0; i < rows; i++)
+ 	{
+ 		mat->data[i] = (float*)calloc(columns, sizeof(float));
+ 	}
+ 	return mat;
+ }
+
+ void printArray(matrix* mat)
+ {
+
+ 	int i, j;
+ 	for(i = 0; i < mat->rows; i++)
+ 	{
+ 		for(j = 0; j < mat->columns; j++)
+ 		{
+ 			printf("%f ", mat->data[i][j] );
+ 		}
+ 		printf("\n");
+ 	}
+ }
+
+ int myround(float f)
+ {
+ 	return (f >= 0) ? (int)(f + 0.5) : (int)(f - 0.5);
+ }
+
+ matrix* matrix_mult(matrix* matA, matrix* matB)
+ {
+ 		int i, j, k;
+     matrix* c = getAMatrix(mata->rows, matB->columns);
+     for (i = 0; i < matA->rows; i++)
+     {
+         for (k = 0; k < matB->columns; k++)
+         {
+             for (j = 0; j < matA->columns; j++)
+             {
+                 c->data[i][k] += (matA->data[i][j]) * (matB->data[j][k]);
+             }
+         }
+     }
+
+     return c;
+ }
+
+ float distancebetween(matrix* A, matrix* B) // from A to B (2D)
+ {
+ 	float diffX = (B->data[0][B->columns - 1] - A->data[0][A->columns - 1]);
+ 	float diffY = (B->data[1][B->columns - 1] - A->data[1][A->columns - 1]);
+ 	return sqrt((diffX * diffX) + (diffY * diffY));
+ }
+
+ float distanceto(matrix* B) // from origin to B (2D)
+ {
+ 	return sqrt((B->data[0][B->columns - 1] * B->data[0][B->columns - 1])
+ 						+ (B->data[1][B->columns - 1] * B->data[1][B->columns - 1]));
+ }
+
+ float angleto(matrix* B) // from origin to B (2D)
+ {
+ 	return atan2(B->data[1][B->columns - 1], B->data[0][B->columns]) * (180 / PI);
+ }
+
+ float angleBetween(matrix* A, matrix* B) // from A to B (2D)
+ {
+ 	float diffX = (B->data[0][B->columns - 1] - A->data[0][A->columns - 1]);
+ 	float diffY = (B->data[1][B->columns - 1] - A->data[1][A->columns - 1]);
+ 	return atan2(diffY, diffX) * (180 / PI);
+ }
+
+ void reset_arm()
+ {
+ 	enable_servos();
+ 	set_servo_position(0, 230); //lower number moves up from shoulder
+ 	set_servo_position(3, 1700); //higher number moves up from elbow
+ 	sleep(1.0);
+ 	disable_servos();
  }
