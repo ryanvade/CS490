@@ -13,6 +13,21 @@ typedef struct{
 } matrix;
 
 matrix* frameTranslationRotationZAxis(float theta, matrix* origin, matrix* destG);
+
+matrix* getAMatrix(int rows, int columns)
+{
+	int i;
+	matrix* mat = (matrix*)calloc(1, sizeof(mat));
+	mat->rows = rows;
+	mat->columns = columns;
+	mat->data = (float**)calloc(rows, sizeof(float*));
+	for(i = 0; i < rows; i++)
+	{
+		mat->data[i] = (float*)calloc(columns, sizeof(float));
+	}
+	return mat;
+}
+
 void printArray(matrix* mat)
 {
 
@@ -34,21 +49,12 @@ int myround(float f)
 
 matrix* matrix_mult(matrix* matA, matrix* matB)
 {
-    matrix* c = (matrix*)calloc(1, sizeof(c));
-    int i, j, k;
-		c->rows = matA->rows;
-		c->columns = matB->columns;
-
-    c->data = malloc(sizeof(float* ) * matA->rows);
-
+		int i, j, k;
+    matrix* c = getAMatrix(mata->rows, matB->columns);
     for (i = 0; i < matA->rows; i++)
     {
-        c->data[i] = malloc(sizeof(float) * matB->columns);
-
         for (k = 0; k < matB->columns; k++)
         {
-            c->data[i][k] = 0.0;
-
             for (j = 0; j < matA->columns; j++)
             {
                 c->data[i][k] += (matA->data[i][j]) * (matB->data[j][k]);
@@ -92,39 +98,13 @@ void reset_arm(){
 	disable_servos();
 }
 
-matrix* getAMatrix(int rows, int columns)
-{
-	matrix* mat = (matrix*)calloc(1, sizeof(mat));
-	mat->rows = rows;
-	mat->columns = columns;
-	return mat;
-}
-
 int main()
 {
 	float theta = PI / 2.0;
 	int i, j,r = 4, c = 1;
-	matrix * robotG = (matrix*)calloc(1, sizeof(robotG));
-	robotG->rows = 4;
-	robotG->columns = 1;
-	matrix * origin = (matrix*)calloc(1, sizeof(origin));
-	origin->rows = 4;
-	origin->columns = 1;
-	matrix * destG = (matrix*)calloc(1, sizeof(destG));
-	destG->rows = 4;
-	destG->columns = 1;
-	// declare rows
-	robotG->data = (float**)malloc(robotG->rows * sizeof(float*));
-	origin->data = (float**)malloc(origin->rows * sizeof(float*));
-	destG->data = (float**)malloc(destG->rows * sizeof(float*));
-
-	// declare columns
-	for(i = 0; i < r; i++)
-	{
-		robotG->data[i] = (float*)malloc(robotG->columns * sizeof(float));
-		origin->data[i] = (float*)malloc(origin->columns *  sizeof(float));
-		destG->data[i] = (float*)malloc(destG->columns * sizeof(float));
-	}
+	matrix * robotG = getAMatrix(4, 1);
+	matrix * origin = getAMatrix(4, 1);
+	matrix * destG = getAMatrix(4, 1);
 
 	for(i = 0; i < 4; i++)
 	{
@@ -171,19 +151,8 @@ int main()
 matrix* frameTranslationRotationZAxis(float theta, matrix* origin, matrix* destG)
 {
 	int i, j;
-	matrix* tOD = (matrix*)calloc(1, sizeof(tOD));
-	tOD->rows = 4;
-	tOD->columns = 4;
-	matrix* rOOP = (matrix*)calloc(1, sizeof(rOOP));
-	rOOP->rows = 4;
-	rOOP->columns = 4;
-	tOD->data = calloc(4, sizeof(float)); // Translation matrix from Origin to destGination
-	rOOP->data = calloc(4, sizeof(float)); // Rotation matrix from Origin to Origin Prime
-	for(i = 0; i < 4;i++)
-		{
-			tOD->data[i] = calloc(4, sizeof(tOD[i]));
-			rOOP->data[i] = calloc(4, sizeof(rOOP[i]));
-		}
+	matrix* tOD = getAMatrix(4, 4);
+	matrix* rOOP = getAMatrix(4, 4);
 
 	tOD->data[0][0] = 1.0; // (1,1)
 	tOD->data[0][3] = destG->data[0][0]; // (1, 4)
