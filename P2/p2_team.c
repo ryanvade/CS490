@@ -20,6 +20,9 @@
 #define DISTANCEINTHREEOFASQUARE 0.53
 #define CIRCUMFERENCE PI * 6.5
 #define MAXVELOCITY  5.5 // in cm/s
+#define DISTANCEFROMROBOTTOCAMERAX TODO
+#define DISTANCEFROMROBOTTOCAMERAY TODO
+#define DISTANCEFROMROBOTTOCAMERAZ TODO
 
 typedef struct{
 	int rows;
@@ -46,9 +49,11 @@ float anglebetween(matrix* A, matrix* B);
 float distancebetween(matrix* A, matrix* B);
 matrix* matrix_mult(matrix* matA, matrix* matB);
 matrix* translationMatrix(matrix* origin, matrix* dest);
-matrix* rotationXMatrix(float thetaZ, matrix* origin, matrix* dest);
-matrix* rotationYMatrix(float thetaZ, matrix* origin, matrix* dest);
+matrix* rotationXMatrix(float thetaX, matrix* origin, matrix* dest);
+matrix* rotationXMatrix(float thetaY, matrix* origin, matrix* dest);
 matrix* rotationZMatrix(float thetaZ, matrix* origin, matrix* dest);
+matrix* frameTranslationRotationXAxis(float thetaX, matrix* origin, matrix* dest);
+matrix* frameTranslationRotationYAxis(float thetaY, matrix* origin, matrix* dest);
 matrix* frameTranslationRotationZAxis(float thetaZ, matrix* origin, matrix* dest);
 /********************************END MATH**************************************/
 
@@ -250,7 +255,7 @@ void turnToAngle(float angle)
 	turn(1, ticks);
 }
 
-matrix* rotationXMatrix(float thetaZ, matrix* origin, matrix* dest)
+matrix* rotationXMatrix(float thetaX, matrix* origin, matrix* dest)
 {
 	matrix* rot = getAMatrix(4, 4);
 	rot->data[0][0] = 1.0;
@@ -262,7 +267,7 @@ matrix* rotationXMatrix(float thetaZ, matrix* origin, matrix* dest)
 	return rot;
 }
 
-matrix* rotationYMatrix(float thetaZ, matrix* origin, matrix* dest)
+matrix* rotationXMatrix(float thetaY, matrix* origin, matrix* dest)
 {
 	matrix* rot = getAMatrix(4, 4);
 	rot->data[0][0] = cos(thetaZ);
@@ -301,7 +306,7 @@ matrix* translationMatrix(matrix* origin, matrix* dest)
 	trans->data[3][3] = origin->data[3][origin->columns - 1] / dest->data[3][origin->columns - 1];
 }
 
-matrix* frameTranslationRotationXAxis(float thetaZ, matrix* origin, matrix* dest)
+matrix* frameTranslationRotationXAxis(float thetaX, matrix* origin, matrix* dest)
 {
 	int i, j;
 	matrix* tOD = translationMatrix(origin, dest);
@@ -309,7 +314,7 @@ matrix* frameTranslationRotationXAxis(float thetaZ, matrix* origin, matrix* dest
 	return matrix_mult(tOD, rOOP);
  }
 
- matrix* frameTranslationRotationYAxis(float thetaZ, matrix* origin, matrix* dest)
+ matrix* frameTranslationRotationYAxis(float thetaY, matrix* origin, matrix* dest)
  {
  	int i, j;
  	matrix* tOD = translationMatrix(origin, dest);
