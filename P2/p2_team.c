@@ -300,9 +300,9 @@ matrix* translationMatrix(matrix* origin, matrix* dest)
 	trans->data[0][0] = 1.0;
 	trans->data[1][1] = 1.0;
 	trans->data[2][2] = 1.0;
-	trans->data[0][4] = dest->data[1][dest->columns - 1]; // dest Y
+	trans->data[0][4] = 0.0; // probably should be something else but ehh
 	trans->data[1][4] = dest->data[0][dest->columns - 1]; // dest X
-	trans->data[2][4] = 0.0;
+	trans->data[2][4] = 0.0; // probably should be something else but ehh
 	trans->data[3][3] = origin->data[3][origin->columns - 1] / dest->data[3][origin->columns - 1];
 }
 
