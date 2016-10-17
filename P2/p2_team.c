@@ -8,8 +8,8 @@
 #define SLEEP_INTERVAL 0.15
 #define SHOULDER 0
 #define ELBOW 3
-#define CLOCKWISE 1
-#define CCW -1
+#define CLOCKWISE 0
+#define CCW 1
 #define FRONT_SENSOR 0
 #define FRONT_LEFT_SENSOR 4
 #define FRONT_RIGHT_SENSOR 6
@@ -71,7 +71,17 @@ int main()
 	char* behaviors[3] = {"Go To", "Point", "Go & Point"};
 	short a_state = 0;
 	color c = 0;
-	p _p;
+
+	matrix* origin = getAMatrix(4, 1); // the origin matrix
+	origin->data[3][0] = 1.0;
+
+	matrix* robotG = getAMatrix(4, 1); // the robot position in the global reference frame
+	robotG->data[0][0] = 2.0;
+	robotG->data[2][0] = PI / 2.0;
+	robotG->data[3][0] = 1.0;
+
+	matrix* destG; // the destination in the global reference frame
+
 	while(1){
 		sleep(SLEEP_INTERVAL);
 		//listen for input
@@ -86,7 +96,7 @@ int main()
 				case 0:
 					//f = &go_to;
 
-					_p = select_coordinates();
+					destG = select_coordinates();
 					turn(CCW, 2.64);
 					//go_to(_p.x, _p.y);
 					//confirmation();
@@ -96,7 +106,7 @@ int main()
 					//confirmation();
 					break;
 				case 2:
-					_p = select_coordinates();
+					destG = select_coordinates();
 					c = select_color();
 					Point(c);
 					//confirmation();
@@ -111,10 +121,10 @@ void go_to(matrix* origin, matrix* robotG, matrix* destG){
 	int i;
 	reset_arm();
 	// face the point
-	matrix* fGR = frameTranslationRotationZAxis(robotG->data[2][robotG->columns -1], origin, destG);
+	matrix* fGR = frameTranslationRotationZAxis(robotG->data[2][robotG->columns -1], origin, destG);// go from Global to Robot and back
 	printf("fGR: \n");
 	printArray(fGR);
-	matrix* destR = twoDimensionalMatrixMult(destG, fGR);
+	matrix* destR = twoDimensionalMatrixMult(destG, fGR); // destination in the robots reference frame
 	printf("DestR: \n");
 	printArray(destR);
 
@@ -145,8 +155,8 @@ void Point(int channel){
 
 	//do something if blob is detected
 	if(track_count(channel) > 0){
-		pointCamera->data[0][pointCamera->columns] = track_x(channel, 0);
-		pointCamera->data[1][pointCamera->columns] = track_y(channel, 0);
+		pointCamera->data[0][pointCamera->columns - 1] = track_x(channel, 0);
+		pointCamera->data[1][pointCamera->columns - 1] = track_y(channel, 0);
 
 	}
 	//check IR as well
@@ -243,7 +253,7 @@ matrix* rotationXMatrix(float theta, matrix* origin, matrix* dest)
 	rot->data[1][2] = -1.0 * sin(theta);
 	rot->data[2][1] = sin(theta);
 	rot->data[1][2] = cos(theta);
-	rot->data[3][3] = origin->data[3][origin->columns] / dest->data[3][origin->columns];
+	rot->data[3][3] = origin->data[3][origin->columns - 1] / dest->data[3][origin->columns - 1];
 	return rot;
 }
 
@@ -255,7 +265,7 @@ matrix* rotationYMatrix(float theta, matrix* origin, matrix* dest)
 	rot->data[1][1] = 1.0;
 	rot->data[2][0] = 1.0 * sin(theta);
 	rot->data[2][2] = cos(theta);
-	rot->data[3][3] = origin->data[3][origin->columns] / dest->data[3][origin->columns];
+	rot->data[3][3] = origin->data[3][origin->columns - 1] / dest->data[3][origin->columns - 1];
 	return rot;
 }
 
@@ -270,7 +280,7 @@ matrix* rotationZMatrix(float theta, matrix* origin, matrix* dest)
 	rot->data[1][3] = origin->data[1][0];
 	rot->data[2][2] = 1.0;
 	rot->data[2][3] = origin->data[2][0];
-	rot->data[3][3] = origin->data[3][origin->columns] / dest->data[3][origin->columns];
+	rot->data[3][3] = origin->data[3][origin->columns - 1] / dest->data[3][origin->columns - 1];
 	return rot;
 }
 
@@ -280,10 +290,10 @@ matrix* translationMatrix(matrix* origin, matrix* dest)
 	trans->data[0][0] = 1.0;
 	trans->data[1][1] = 1.0;
 	trans->data[2][2] = 1.0;
-	trans->data[0][4] = dest->data[1][dest->columns]; // dest Y
-	trans->data[1][4] = dest->data[0][dest->columns]; // dest X
+	trans->data[0][4] = dest->data[1][dest->columns - 1]; // dest Y
+	trans->data[1][4] = dest->data[0][dest->columns - 1]; // dest X
 	trans->data[2][4] = 0.0;
-	trans->data[3][3] = origin->data[3][origin->columns] / dest->data[3][origin->columns];
+	trans->data[3][3] = origin->data[3][origin->columns - 1] / dest->data[3][origin->columns - 1];
 }
 
 matrix* frameTranslationRotationXAxis(float theta, matrix* origin, matrix* dest)
@@ -344,7 +354,7 @@ matrix* frameTranslationRotationZAxis(float theta, matrix* origin, matrix* dest)
 
  float angleto(matrix* B) // from origin to B (2D)
  {
- 	return atan2(B->data[1][B->columns - 1], B->data[0][B->columns]) * (180 / PI);
+ 	return atan2(B->data[1][B->columns - 1], B->data[0][B->columns - 1]) * (180 / PI);
  }
 
  float anglebetween(matrix* A, matrix* B) // from A to B (2D)
@@ -388,25 +398,25 @@ matrix* select_coordinates(){
 	//default location is (3, 0)
 	//range is 0-6 in x, 0-5 in y
 	matrix* destination = getAMatrix(4, 1);
-	destination->data[0][destination->columns] = 3;
-	destination->data[1][destination->columns] = 0;
+	destination->data[0][destination->columns - 1] = 3;
+	destination->data[1][destination->columns - 1] = 0;
 	//press B to set values
 	do{
 		sleep(SLEEP_INTERVAL);
 		if(up_button()){
-			destination->data[1][destination->columns] = ((destination->data[1][destination->columns] + 1.0) % 6.0);
+			destination->data[1][destination->columns - 1] = ((destination->data[1][destination->columns - 1] + 1.0) % 6.0);
 		}
 		if(down_button()){
-			destination->data[1][destination->columns] = abs((destination->data[1][destination->columns] - 1.0) % 6.0);
+			destination->data[1][destination->columns - 1] = abs((destination->data[1][destination->columns - 1] - 1.0) % 6.0);
 		}
 		if(right_button()){
-		 	destination->data[0][destination->columns] =((destination->data[0][destination->columns] + 1.0) % 7.0);
+		 	destination->data[0][destination->columns - 1] =((destination->data[0][destination->columns - 1] + 1.0) % 7.0);
 		}
 		if(left_button()){
-			destination->data[0][destination->columns] = abs((destination->data[0][destination->columns] - 1.0) % 7.0);
+			destination->data[0][destination->columns - 1] = abs((destination->data[0][destination->columns - 1] - 1.0) % 7.0);
 		}
 		cbc_display_clear();
-		cbc_printf(0,0, "Destination: ( %f, %f )", myround(destination->data[0][destination->columns]), myround(destination->data[1][destination->columns]));
+		cbc_printf(0,0, "Destination: ( %f, %f )", myround(destination->data[0][destination->columns - 1]), myround(destination->data[1][destination->columns - 1]));
 	} while(!b_button());
 	cbc_display_clear();
 	return destination;
