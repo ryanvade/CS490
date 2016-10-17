@@ -6,16 +6,11 @@
 
 #define PI 3.141592
 
-<<<<<<< HEAD
-int** twoDimensionalMatrixMult(int** A, int rowsA, int columnsA, int** B, int rowsB, int columnsB);
-int** frameTranslationRotationZAxis(float theta, int** origin, int** dest);
-=======
 typedef struct{
 	int rows;
 	int columns;
 	float** data;
 } matrix;
->>>>>>> e9c467200531ba811be2792baefcef8b32cfd715
 
 void reset_arm();
 int myround(float f);
@@ -46,56 +41,6 @@ int main()
 		}
 	}
 
-<<<<<<< HEAD
-int main() 
-{
-	float theta = 3.141592 / 2.0;
-	int i, j;
-	
-	int** pointG = calloc(1, sizeof(pointG));
-	for(i = 0; i < 1; i++)
-	{
-		pointG[i] = calloc(4, sizeof(pointG));
-	}
-	
-	pointG[0][0] = 3;
-	pointG[0][1] = 3;
-	pointG[0][2] = 0;
-	pointG[0][3] = 1;
-	
-	int** origin = calloc(1, sizeof(origin));
-	for(i = 0; i < 1;i++)
-	{
-		origin[i] = calloc(4, sizeof(origin));
-	}
-	origin[0][0] = 0;
-	origin[0][1] = 0;
-	origin[0][2] = 0;
-	origin[0][3] = 1;
-	
-	int** dest = calloc(1, sizeof(dest));
-	for(i = 0; i < 1; i++)
-	{
-		dest[i] = calloc(4, sizeof(dest));
-	}
-	dest[0][0] = 0.0;
-	dest[0][1] = -2.0;
-	dest[0][2] = 0.0;
-	dest[0][3] = 1.0;
-		
-	int** fGR = frameTranslationRotationZAxis(theta, origin, dest);
-	
-	printArray(pointG, 1, 4);
-	printf("\n");
-	printArray(fGR, 4, 4);
-	printf("\n");
-	
-	int** pointR = twoDimensionalMatrixMult(pointG, 1, 4, fGR, 4, 4);
-	if(pointR == NULL)
-	{
-		printf("The Array is NULL\n");
-	}else
-=======
 	robotG->data[0][0] = 0.0;
 	robotG->data[1][0] = 2.0;
 	robotG->data[2][0] = theta;
@@ -114,7 +59,6 @@ int main()
 	matrix* fGR = frameTranslationRotationZAxis(theta, origin, robotG);
 	matrix* pointRobot = matrix_mult(fGR, destG);
 	for(i = 0; i < r; i++)
->>>>>>> e9c467200531ba811be2792baefcef8b32cfd715
 	{
 			free(robotG->data[i]);
 			free(origin->data[i]);
