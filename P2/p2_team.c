@@ -24,6 +24,9 @@
 typedef struct{
 	int rows;
 	int columns;
+	float thetaX;
+	float thetaY;
+	float thetaZ;
 	float** data;
 } matrix;
 
@@ -43,10 +46,10 @@ float anglebetween(matrix* A, matrix* B);
 float distancebetween(matrix* A, matrix* B);
 matrix* matrix_mult(matrix* matA, matrix* matB);
 matrix* translationMatrix(matrix* origin, matrix* dest);
-matrix* rotationXMatrix(float theta, matrix* origin, matrix* dest);
-matrix* rotationYMatrix(float theta, matrix* origin, matrix* dest);
-matrix* rotationZMatrix(float theta, matrix* origin, matrix* dest);
-matrix* frameTranslationRotationZAxis(float theta, matrix* origin, matrix* dest);
+matrix* rotationXMatrix(float thetaZ, matrix* origin, matrix* dest);
+matrix* rotationYMatrix(float thetaZ, matrix* origin, matrix* dest);
+matrix* rotationZMatrix(float thetaZ, matrix* origin, matrix* dest);
+matrix* frameTranslationRotationZAxis(float thetaZ, matrix* origin, matrix* dest);
 /********************************END MATH**************************************/
 
 /*******************************Movement***************************************/
@@ -77,8 +80,9 @@ int main()
 
 	matrix* robotG = getAMatrix(4, 1); // the robot position in the global reference frame
 	robotG->data[0][0] = 2.0;
-	robotG->data[2][0] = PI / 2.0;
+	robotG->data[2][0] = 0.0;
 	robotG->data[3][0] = 1.0;
+	robotG->thetaZ = PI / 2;
 
 	matrix* destG; // the destination in the global reference frame
 
@@ -119,7 +123,7 @@ void go_to(matrix* origin, matrix* robotG, matrix* destG){
 	int i;
 	reset_arm();
 	// face the point
-	matrix* fGR = frameTranslationRotationZAxis(robotG->data[2][robotG->columns -1], origin, destG);// go from Global to Robot and back
+	matrix* fGR = frameTranslationRotationZAxis(robotG->thetaZ, origin, destG);// go from Global to Robot and back
 	printf("fGR: \n");
 	printArray(fGR);
 	matrix* destR = twoDimensionalMatrixMult(destG, fGR); // destination in the robots reference frame
@@ -131,13 +135,13 @@ void go_to(matrix* origin, matrix* robotG, matrix* destG){
 	int movingIterations = myround(distanceToPoint / (float)DISTANCEINTHREE);
 
 	turnToAngle(angleToPoint);
-	robotG->data[2][robotG->columns - 1] += angleToPoint;
+	robotG->thetaZ += angleToPoint; // set new angle of robot
 
 	for(i = 0; i < movingIterations; i++)
 	{
 		moveAndBeep();
-		robotG->data[0][robotG->columns -1] += (DISTANCEINTHREEOFASQUARE * cos(robotG->data[2][robotG->columns - 1]));
-		robotG->data[1][robotG->columns -1] += (DISTANCEINTHREEOFASQUARE * sin(robotG->data[2][robotG->columns - 1]));
+		robotG->data[0][robotG->columns -1] += (DISTANCEINTHREEOFASQUARE * cos(robotG->thetaZ)); // set new x of robot
+		robotG->data[1][robotG->columns -1] += (DISTANCEINTHREEOFASQUARE * sin(robotG->thetaZ)); // set new y of robot
 		printf("Robot location in the global: ");
 		printArray(robotG);
 	}
@@ -167,6 +171,9 @@ matrix* getAMatrix(int rows, int columns)
  	matrix* mat = (matrix*)calloc(1, sizeof(mat));
  	mat->rows = rows;
  	mat->columns = columns;
+	mat->thetaX = 0.0;
+	mat->thetaY = 0.0;
+	mat->thetaZ = 0.0;
  	mat->data = (float**)calloc(rows, sizeof(float*));
  	for(i = 0; i < rows; i++)
  	{
@@ -243,38 +250,38 @@ void turnToAngle(float angle)
 	turn(1, ticks);
 }
 
-matrix* rotationXMatrix(float theta, matrix* origin, matrix* dest)
+matrix* rotationXMatrix(float thetaZ, matrix* origin, matrix* dest)
 {
 	matrix* rot = getAMatrix(4, 4);
 	rot->data[0][0] = 1.0;
-	rot->data[1][1] = cos(theta);
-	rot->data[1][2] = -1.0 * sin(theta);
-	rot->data[2][1] = sin(theta);
-	rot->data[1][2] = cos(theta);
+	rot->data[1][1] = cos(thetaZ);
+	rot->data[1][2] = -1.0 * sin(thetaZ);
+	rot->data[2][1] = sin(thetaZ);
+	rot->data[1][2] = cos(thetaZ);
 	rot->data[3][3] = origin->data[3][origin->columns - 1] / dest->data[3][origin->columns - 1];
 	return rot;
 }
 
-matrix* rotationYMatrix(float theta, matrix* origin, matrix* dest)
+matrix* rotationYMatrix(float thetaZ, matrix* origin, matrix* dest)
 {
 	matrix* rot = getAMatrix(4, 4);
-	rot->data[0][0] = cos(theta);
-	rot->data[0][2] = sin(theta);
+	rot->data[0][0] = cos(thetaZ);
+	rot->data[0][2] = sin(thetaZ);
 	rot->data[1][1] = 1.0;
-	rot->data[2][0] = 1.0 * sin(theta);
-	rot->data[2][2] = cos(theta);
+	rot->data[2][0] = 1.0 * sin(thetaZ);
+	rot->data[2][2] = cos(thetaZ);
 	rot->data[3][3] = origin->data[3][origin->columns - 1] / dest->data[3][origin->columns - 1];
 	return rot;
 }
 
-matrix* rotationZMatrix(float theta, matrix* origin, matrix* dest)
+matrix* rotationZMatrix(float thetaZ, matrix* origin, matrix* dest)
 {
 	matrix* rot = getAMatrix(4, 4);
-	rot->data[0][0] = cos(theta);
-	rot->data[0][1] = sin(theta);
+	rot->data[0][0] = cos(thetaZ);
+	rot->data[0][1] = sin(thetaZ);
 	rot->data[0][3] = origin->data[0][0];
-	rot->data[1][0] = -1.0 * sin(theta);
-	rot->data[1][1] = cos(theta);
+	rot->data[1][0] = -1.0 * sin(thetaZ);
+	rot->data[1][1] = cos(thetaZ);
 	rot->data[1][3] = origin->data[1][0];
 	rot->data[2][2] = 1.0;
 	rot->data[2][3] = origin->data[2][0];
@@ -294,27 +301,27 @@ matrix* translationMatrix(matrix* origin, matrix* dest)
 	trans->data[3][3] = origin->data[3][origin->columns - 1] / dest->data[3][origin->columns - 1];
 }
 
-matrix* frameTranslationRotationXAxis(float theta, matrix* origin, matrix* dest)
+matrix* frameTranslationRotationXAxis(float thetaZ, matrix* origin, matrix* dest)
 {
 	int i, j;
 	matrix* tOD = translationMatrix(origin, dest);
-	matrix* rOOP = rotationXMatrix(theta, origin, dest);
+	matrix* rOOP = rotationXMatrix(thetaZ, origin, dest);
 	return matrix_mult(tOD, rOOP);
  }
 
- matrix* frameTranslationRotationYAxis(float theta, matrix* origin, matrix* dest)
+ matrix* frameTranslationRotationYAxis(float thetaZ, matrix* origin, matrix* dest)
  {
  	int i, j;
  	matrix* tOD = translationMatrix(origin, dest);
- 	matrix* rOOP = rotationYMatrix(theta, origin, dest);
+ 	matrix* rOOP = rotationYMatrix(thetaZ, origin, dest);
  	return matrix_mult(tOD, rOOP);
 }
 
-matrix* frameTranslationRotationZAxis(float theta, matrix* origin, matrix* dest)
+matrix* frameTranslationRotationZAxis(float thetaZ, matrix* origin, matrix* dest)
 {
 	int i, j;
 	matrix* tOD = translationMatrix(origin, dest);
-	matrix* rOOP = rotationZMatrix(theta, origin, dest);
+	matrix* rOOP = rotationZMatrix(thetaZ, origin, dest);
 	return matrix_mult(tOD, rOOP);
  }
 
