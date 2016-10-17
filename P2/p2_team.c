@@ -95,10 +95,8 @@ int main()
 			switch(a_state){
 				case 0:
 					//f = &go_to;
-
 					destG = select_coordinates();
-					turn(CCW, 2.64);
-					//go_to(_p.x, _p.y);
+					go_to(origin, robotG, destG);
 					//confirmation();
 					break;
 				case 1:
