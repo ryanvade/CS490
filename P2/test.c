@@ -6,8 +6,8 @@
 
 #define PI 3.141592; 
 
-float* twoDimensionalMatrixMult(float* A, int rowsA, int columnsA, float* B, int rowsB, int columnsB);
-float* frameTranslationRotationZAxis(float theta, float* origin, float* dest);
+int** twoDimensionalMatrixMult(int** A, int rowsA, int columnsA, int** B, int rowsB, int columnsB);
+int** frameTranslationRotationZAxis(float theta, int** origin, int** dest);
 
 void printArray(float* arr, int rowsArr, int columnsArr)
 {
@@ -27,39 +27,46 @@ int main()
 {
 	float theta = 3.141592 / 2.0;
 	int i, j;
-	float* pointG = malloc(1 * 4 * sizeof(pointG));
+	
+	int** pointG = calloc(1, sizeof(pointG));
 	for(i = 0; i < 1; i++)
 	{
-		for(j = 0; j < 4; j++)
-		{
-			pointG[i * sizeof(pointG) + j] = 0;
-		}
+		pointG[i] = calloc(4, sizeof(pointG));
 	}
-	pointG[0 * sizeof(pointG) + 0] = 3;
-	pointG[0 * sizeof(pointG) + 1] = 3;
-	pointG[0 * sizeof(pointG) + 2] = 0;
-	pointG[0 * sizeof(pointG) + 3] = 1;
 	
-	float* origin = malloc(4 * sizeof(origin));
-	origin[0] = 0.0;
-	origin[1] = 0.0;
-	origin[2] = 0.0;
-	origin[3] = 1.0;
+	pointG[0][0] = 3;
+	pointG[0][1] = 3;
+	pointG[0][2] = 0;
+	pointG[0][3] = 1;
 	
-	float* dest = malloc(4 * sizeof(dest));
-	dest[0] = 0.0;
-	dest[1] = -2.0;
-	dest[2] = 0.0;
-	dest[3] = 1.0;
+	int** origin = calloc(1, sizeof(origin));
+	for(i = 0; i < 1;i++)
+	{
+		origin[i] = calloc(4, sizeof(origin));
+	}
+	origin[0][0] = 0;
+	origin[0][1] = 0;
+	origin[0][2] = 0;
+	origin[0][3] = 1;
+	
+	int** dest = calloc(1, sizeof(dest));
+	for(i = 0; i < 1; i++)
+	{
+		dest[i] = calloc(4, sizeof(dest));
+	}
+	dest[0][0] = 0.0;
+	dest[0][1] = -2.0;
+	dest[0][2] = 0.0;
+	dest[0][3] = 1.0;
 		
-	float* fGR = frameTranslationRotationZAxis(theta, origin, dest);
+	int** fGR = frameTranslationRotationZAxis(theta, origin, dest);
 	
 	printArray(pointG, 1, 4);
 	printf("\n");
 	printArray(fGR, 4, 4);
 	printf("\n");
 	
-	float* pointR = twoDimensionalMatrixMult(pointG, 1, 4, fGR, 4, 4);
+	int** pointR = twoDimensionalMatrixMult(pointG, 1, 4, fGR, 4, 4);
 	if(pointR == NULL)
 	{
 		printf("The Array is NULL\n");
