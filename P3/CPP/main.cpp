@@ -1,6 +1,5 @@
 #include <iostream>
 #include "NeuralNetwork.hpp"
-#include "Node.hpp"
 
 using namespace std;
 
