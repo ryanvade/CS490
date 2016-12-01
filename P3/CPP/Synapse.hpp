@@ -1,7 +1,7 @@
 #ifndef SYNAPSE
 #define SYNAPSE
 
-#include "Neuron.hpp"
+//#include "Neuron.hpp"
 
 class Synapse {
 private:

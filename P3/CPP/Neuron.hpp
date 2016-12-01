@@ -1,13 +1,16 @@
 #ifndef NEURON
 #define NEURON
 
-class Neuron {
-private:
+#include "CachedInputNeuron.hpp"
 
+class Neuron: public CachedInputNeuron {
+private:
+  CachedInputNeuron* inputs;
+  double* weights;
 public:
-  Neuron()
+  Neuron(CachedInputNeuron* inputs)
   {
-    // TODO
+    this.inputs = inputs;
   }
 
   ~Neuron()
