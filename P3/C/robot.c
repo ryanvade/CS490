@@ -1,6 +1,8 @@
 #include "cbc.h"
 #include "Network.h"
 
+#include <stdio.h>
+
 #define RIGHT_RANGE 0
 #define LEFT_RANGE 4
 #define CAMERA_INPUT 5
