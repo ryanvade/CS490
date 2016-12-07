@@ -1,4 +1,6 @@
-#include "Network.c"
+#include "Network.h"
+#include "vector.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
