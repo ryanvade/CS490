@@ -1,13 +1,11 @@
 #include "Network.h"
+#include "vector.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 double sigmoid(double x) { return 1 / (1 + exp(-x)); }
 double sigmoidPrime(double x) { return pow(exp(-x) / ((1 + exp(-x))), 2); }
-double costPrime() {
-  // TODO
-}
 
 void initializeNetwork(Network *network, int numHiddenLayers, int *layerSizes) {
   network->layerCount = numHiddenLayers + 2;
@@ -70,10 +68,9 @@ void forwardPropagate(Network *network, double *inputs, double *outputs) {
   }
 
   // Copy the outputs into the buffer, if it was provided
-  if(outputs != NULL)
+  if (outputs != NULL)
     for (int o = 0; o < network->layerSizes[network->layerCount - 1]; o++)
       outputs[o] = network->layers[network->layerCount - 1][o];
-
 }
 
 void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
@@ -101,22 +98,25 @@ void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
     }
   }
 
-  double delta = 0.0;
+  double *delta = NULL;
   double **Zs = (double **)calloc(net->layerCount, sizeof(double *));
-  for (int i = 0; i < net->layerSizes[net->layerCount - 1]; i++) {
-    for (int n = 0; n < net->layerSizes[net->layerCount - 2]; n++) {
-      Zs[net->layerCount - 1] =
-          vectorAdd(dotProduct(net->weights[net->layerCount - 1][i][n],
-                               net->layers[net->layerCount - 2][i],
-                               net->layerSizes[net->layerCount - 2]),
-                    net->biases[net->layerCount - 1][i]);
-    }
+  for (int i = 0; i < net->layerCount; i++) {
+    Zs[i] = (double *)calloc(net->layerSizes[i], sizeof(double *));
   }
 
-  for (int l = 0; l < net->layerCount; l++) {
-    // zi = (Wi * ai-1)+ bi
-    for (int n = 0; n < net->layerCount)
-    double z = vectorAdd(dotProduct(), net->biases[][]
-    // delta = (y - y^) * sp*(zi)
+  for (int outN = 0; outN < net->layerSizes[net->layerCount - 1]; outN++) {
+    Zs[net->layerCount - 1][outN] =
+        dotProduct(net->weights[net->layerCount - 1][outN],
+                   net->layers[net->layerCount - 1],
+                   net->layerSizes[net->layerCount - 1]) +
+        net->biases[net->layerCount - 1][outN];
+    delta = vectorScale(vectorSub(outputs, expectedOutputs,
+                                  net->layerSizes[net->layerCount - 1]),
+                        sigmoidPrime(Zs[net->layerCount - 1][outN]),
+                        net->layerSizes[net->layerCount - 1]);
+    nambla_w[net->layerCount - 1][outN] =
+        dotProduct(delta, net->layers[net->layerCount - 1],
+                   net->layerSizes[net->layerCount - 1]);
+    nambla_b[net->layerCount - 1] = delta;
   }
 }
