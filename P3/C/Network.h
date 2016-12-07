@@ -4,6 +4,7 @@ typedef struct {
   int layerCount;
   int *layerSizes;
   double **layers;
+  double **weightedSums;
   double **biases;
   double ***weights;
 } Network;

@@ -11,14 +11,18 @@ void initializeNetwork(Network *network, int numHiddenLayers, int *layerSizes) {
   network->layerCount = numHiddenLayers + 2;
   network->layerSizes = layerSizes;
   network->layers = (double **)calloc(numHiddenLayers + 2, sizeof(double *));
+  network->weightedSums =
+      (double **)calloc(numHiddenLayers + 2, sizeof(double *));
   network->biases = (double **)calloc(numHiddenLayers + 2, sizeof(double *));
   network->weights = (double ***)calloc(numHiddenLayers + 1, sizeof(double **));
 
   for (int i = 0; i < numHiddenLayers + 2; i++) {
     network->layers[i] = (double *)calloc(layerSizes[i], sizeof(double));
+    network->weightedSums[i] = (double *)calloc(layerSizes[i], sizeof(double));
     network->biases[i] = (double *)calloc(layerSizes[i], sizeof(double));
     for (int j = 0; j < layerSizes[i]; j++) {
       network->layers[i][j] = 0.0;
+      network->weightedSums[i][j] = 0.0;
       network->biases[i][j] = 0.5;
     }
   }
@@ -60,10 +64,11 @@ void forwardPropagate(Network *network, double *inputs, double *outputs) {
   // add the sigmoid of dot product between weights, inputs + b
   for (int l = 1; l < network->layerCount; l++) {
     for (int n = 0; n < network->layerSizes[n]; n++) {
-      network->layers[l][n] =
-          sigmoid(dotProduct(network->weights[l][n], network->layers[l - 1],
-                             network->layerSizes[l - 1]) +
-                  network->biases[l][n]);
+      network->weightedSums[l][n] =
+          dotProduct(network->weights[l][n], network->layers[l - 1],
+                     network->layerSizes[l - 1]) +
+          network->biases[l][n];
+      network->layers[l][n] = network->weightedSums[l][n];
     }
   }
 
@@ -78,45 +83,47 @@ void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
   // actual outputs from the network
   double *outputs = net->layers[net->layerCount - 1];
   // Don't question NAMBLA (North American Marlon Brando Look-Alikes)
-  double **nambla_b = NULL;
-  double ***nambla_w = NULL;
+  double **nambla_b = (double **)calloc(net->layerCount, sizeof(double *));
+  double **nambla_w = (double **)calloc(net->layerCount, sizeof(double *));
+
+  // Calculate the gradient of the weights and bias for each node
+  double *deltas = NULL;
+
+  // sums is vector of weighted sums of node inputs
+  double **sums = (double **)calloc(net->layerCount, sizeof(double *));
+  double *sigmoids =
+      (double *)calloc(net->layerSizes[net->layerCount - 1], sizeof(double));
   for (int i = 0; i < net->layerCount; i++) {
-    nambla_b[i] = (double *)calloc(net->layerSizes[i], sizeof(double));
-    for (int j = 0; j < net->layerSizes[i]; j++) {
-      nambla_b[i][j] = 0.0;
-    }
-  }
-  for (int layer = 1; layer < net->layerCount; layer++) {
-    nambla_w[layer] =
-        (double **)calloc(net->layerSizes[layer], sizeof(double *));
-    for (int node = 0; node < net->layerSizes[layer]; node++) {
-      nambla_w[layer][node] =
-          (double *)calloc(net->layerSizes[layer - 1], sizeof(double));
-      for (int w = 0; w < net->layerSizes[layer - 1]; w++) {
-        nambla_w[layer][node][w] = 0.0;
-      }
-    }
+    sums[i] = (double *)calloc(net->layerSizes[i], sizeof(double *));
   }
 
-  double *delta = NULL;
-  double **Zs = (double **)calloc(net->layerCount, sizeof(double *));
-  for (int i = 0; i < net->layerCount; i++) {
-    Zs[i] = (double *)calloc(net->layerSizes[i], sizeof(double *));
-  }
-
+  // For every output node
   for (int outN = 0; outN < net->layerSizes[net->layerCount - 1]; outN++) {
-    Zs[net->layerCount - 1][outN] =
+
+    // Caclulate the weighted sum of this nodes inputs
+    sums[net->layerCount - 1][outN] =
         dotProduct(net->weights[net->layerCount - 1][outN],
                    net->layers[net->layerCount - 1],
                    net->layerSizes[net->layerCount - 1]) +
         net->biases[net->layerCount - 1][outN];
-    delta = vectorScale(vectorSub(outputs, expectedOutputs,
-                                  net->layerSizes[net->layerCount - 1]),
-                        sigmoidPrime(Zs[net->layerCount - 1][outN]),
-                        net->layerSizes[net->layerCount - 1]);
-    nambla_w[net->layerCount - 1][outN] =
-        dotProduct(delta, net->layers[net->layerCount - 1],
-                   net->layerSizes[net->layerCount - 1]);
-    nambla_b[net->layerCount - 1] = delta;
+
+    sigmoids[outN] = sigmoidPrime(sums[net->layerCount - 1][outN]);
+  }
+  deltas = hadamardMul(
+      vectorSub(outputs, expectedOutputs, net->layerSizes[net->layerCount - 1]),
+      sigmoids, net->layerCount - 1);
+  nambla_b[net->layerCount - 1] = deltas;
+  nambla_w[net->layerCount - 1] =
+      hadamardMul(deltas, net->layers[net->layerCount - 2],
+                  net->layerSizes[net->layerCount - 2]);
+
+  sigmoids = NULL;
+  double d;
+  for (int i = net->layerCount - 2; i > 0; i--) {
+    for (int n = 0; n < net->layerSizes[i]; n++) {
+      sigmoids[n] = sigmoidPrime(net->weightedSums[i][n]);
+    }
+    d = dotProduct(deltas, net->weights[i][]);
+    deltas = vectorSub(deltas, d, net->layerSizes[i + 1]);
   }
 }
