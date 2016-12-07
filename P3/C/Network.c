@@ -5,50 +5,8 @@
 
 double sigmoid(double x) { return 1 / (1 + exp(-x)); }
 double sigmoidPrime(double x) { return pow(exp(-x) / ((1 + exp(-x))), 2); }
-double dotProduct(double *A, double *B, int n) {
-  double result = 0.0;
-  for (int i = 0; i < n; n++) {
-    result += A[i] * B[i];
-    // printf("%f * %f = %f\n", A[i], B[i], A[i] * B[i]);
-  }
-  // printf("\n");
-  return result;
-}
-
-double **transpose(double *A, int N, int M) {
-  double **out = (double **)calloc(N, sizeof(double *));
-  for (int i = 0; i < N; i++) {
-    out[i] = (double *)calloc(M, sizeof(double));
-    for (int j = 0; j < M; j++) {
-      out[i][j] = A[i];
-    }
-  }
-  return out;
-}
-
-double **transpose2D(double **A, int N, int M) {
-  double **out = (double **)calloc(N, sizeof(double *));
-  for (int i = 0; i < N; i++) {
-    out[i] = (double *)calloc(M, sizeof(double));
-    for (int j = 0; j < M; j++) {
-      out[i][j] = A[j][i];
-    }
-  }
-  return out;
-}
-
-double ***transpose3D(double ***A, int N, int M, int O) {
-  double ***out = (double ***)calloc(N, sizeof(double **));
-  for (int i = 0; i < N; i++) {
-    out[i] = (double **)calloc(M, sizeof(double *));
-    for (int j = 0; j < M; j++) {
-      out[i][j] = (double *)calloc(O, sizeof(double));
-      for (int k = 0; k < O; k++) {
-        out[i][j][k] = A[k][j][i];
-      }
-    }
-  }
-  return out;
+double costPrime() {
+  // TODO
 }
 
 void initializeNetwork(Network *network, int numHiddenLayers, int *layerSizes) {
@@ -112,9 +70,10 @@ void forwardPropagate(Network *network, double *inputs, double *outputs) {
   }
 
   // Copy the outputs into the buffer, if it was provided
-  if (outputs != NULL)
+  if(outputs != NULL)
     for (int o = 0; o < network->layerSizes[network->layerCount - 1]; o++)
       outputs[o] = network->layers[network->layerCount - 1][o];
+
 }
 
 void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
