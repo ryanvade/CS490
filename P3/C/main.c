@@ -37,7 +37,7 @@ int main() {
   }
   printf("\n\n");
   double outputs[3] = {0, 1, 2};
-  forwardPropogate(&net, (double *)inputs, (double *)outputs);
+  forwardPropogate(&net, (double *)inputs);
   printf("\n\nBiases: \n");
   for (int i = 0; i < net.layerCount; i++) {
     for (int j = 0; j < net.layerSizes[i]; j++) {

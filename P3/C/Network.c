@@ -57,7 +57,7 @@ void deleteNetwork(Network *network) {
   free(network);
 }
 
-void forwardPropogate(Network *network, double *inputs, double *outputs) {
+void forwardPropogate(Network *network, double *inputs) {
   // set the inputs
   printf("%d", network->layerSizes[0]);
   for (int i = 0; i < network->layerSizes[0]; i++) {
@@ -72,6 +72,32 @@ void forwardPropogate(Network *network, double *inputs, double *outputs) {
           sigmoid(dotProduct(network->weights[l][n], network->layers[l - 1],
                              network->layerSizes[l - 1]) +
                   network->biases[l][n]);
+    }
+  }
+}
+
+void backPropogate(Network *net, double *inputs, double *expectedOutputs) {
+  forwardPropogate(net, inputs);
+  // actual outputs from the network
+  double *outputs = net->layers[net->layerCount - 1];
+  // Don't question NAMBLA (North American Marlon Brando Look-Alikes)
+  double **nambla_b = NULL;
+  double ***nambla_w = NULL;
+  for (int i = 0; i < net->layerCount; i++) {
+    nambla_b[i] = (double *)calloc(net->layerSizes[i], sizeof(double));
+    for (int j = 0; j < net->layerSizes[i]; j++) {
+      nambla_b[i][j] = 0.0;
+    }
+  }
+  for (int layer = 1; layer < net->layerCount; layer++) {
+    nambla_w[layer] =
+        (double **)calloc(net->layerSizes[layer], sizeof(double *));
+    for (int node = 0; node < net->layerSizes[layer]; node++) {
+      nambla_w[layer][node] =
+          (double *)calloc(net->layerSizes[layer - 1], sizeof(double));
+      for (int w = 0; w < net->layerSizes[layer - 1]; w++) {
+        nambla_w[layer][node][w] = 0.0;
+      }
     }
   }
 }
