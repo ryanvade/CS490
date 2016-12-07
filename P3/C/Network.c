@@ -5,7 +5,9 @@
 
 double sigmoid(double x) { return 1 / (1 + exp(-x)); }
 double sigmoidPrime(double x) { return pow(exp(-x) / ((1 + exp(-x))), 2); }
-double costPrime(double x) { return 0.0; }
+double costPrime() {
+  // TODO
+}
 double dotProduct(double *A, double *B, int n) {
   double result = 0.0;
   for (int i = 0; i < n; n++) {
@@ -136,5 +138,9 @@ void backPropogate(Network *net, double *inputs, double *expectedOutputs) {
         nambla_w[layer][node][w] = 0.0;
       }
     }
+  }
+
+  for (int out = 0; out < net->layerSizes[net->layerCount - 1]; out++) {
+    // nambla_b[net->layerCount - 1][out] = // COST PRIME
   }
 }
