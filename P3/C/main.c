@@ -1,57 +1,67 @@
-struct {
-  double (*activation) (double);
-  node** input;
-  double* weights;
-  int numInput;
-  node** output;
-  int numOutput;
-  double out;
-} node;
+#include "Network.c"
+#include <stdio.h>
+#include <stdlib.h>
 
-struct {
-  double (*get)(void);
-} output;
-
-struct {
-  double (*set)(double);
-} input;
-
-double sigmoid(double input)
-{
-  return 0.0;
-}
-
-double threshold(double input)
-{
-  return 0.0;
-}
-
-double weightedSum(node* n)
-{
-  double sum = 0.0;
-  for(i = 0; i < n->numInput; i++)
-  {
-    sum += n->input[i]->out * n->weights[i];
+int main() {
+  Network net;
+  int layerSizes[4] = {6, 4, 4, 3};
+  initializeNetwork(&net, 2, (int *)layerSizes);
+  double inputs[6] = {0, 1, 2, 3, 4, 5};
+  printf("%d \n", net.layerSizes[0]);
+  for (int i = 0; i < net.layerSizes[0]; i++) {
+    net.layers[0][i] = inputs[i];
   }
-  return sum;
-}
-
-void updateOutput(node* n)
-{
-  n->output = n->activation(weightedSum(n));
-}
-
-node** constructNetwork(int numLayers, int* numPerlayer, int numInputs, node** inputs, int numOutput,node** outputs)
-{
-  node** hiddenlayer = calloc(numLayers);
-  for(int i = 0; i < numLayers; i++)
-  {
-    hiddenlayer[i] = calloc(numPerlayer[i]);
+  printf("\n\nBiases: \n");
+  for (int i = 0; i < net.layerCount; i++) {
+    for (int j = 0; j < net.layerSizes[i]; j++) {
+      printf("%f ", net.biases[i][j]);
+    }
+    printf("\n ");
   }
-  
-}
+  printf("\n\nLayers: \n");
+  for (int i = 0; i < net.layerCount; i++) {
+    for (int j = 0; j < net.layerSizes[i]; j++) {
+      printf("%f ", net.layers[i][j]);
+    }
+    printf("\n ");
+  }
+  printf("\n\n");
+  printf("\n\nWeights: \n");
+  for (int i = 1; i < net.layerCount; i++) {
+    for (int j = 0; j < net.layerSizes[i]; j++) {
+      for (int k = 0; k < net.layerSizes[i - 1]; k++) {
+        printf("%f ", net.weights[i][j][k]);
+      }
+    }
+    printf("\n ");
+  }
+  printf("\n\n");
+  double outputs[3] = {0, 1, 2};
+  forwardPropogate(&net, (double *)inputs, (double *)outputs);
+  printf("\n\nBiases: \n");
+  for (int i = 0; i < net.layerCount; i++) {
+    for (int j = 0; j < net.layerSizes[i]; j++) {
+      printf("%f ", net.biases[i][j]);
+    }
+    printf("\n ");
+  }
+  printf("\n\nLayers: \n");
+  for (int i = 0; i < net.layerCount; i++) {
+    for (int j = 0; j < net.layerSizes[i]; j++) {
+      printf("%f ", net.layers[i][j]);
+    }
+    printf("\n ");
+  }
+  printf("\n\nWeights: \n");
+  for (int i = 1; i < net.layerCount; i++) {
+    for (int j = 0; j < net.layerSizes[i]; j++) {
+      for (int k = 0; k < net.layerSizes[i - 1]; k++) {
+        printf("%f ", net.weights[i][j][k]);
+      }
+    }
+    printf("\n ");
+  }
+  printf("\n\n");
 
-int main()
-{
-  node** hiddenLayers;
+  return 0;
 }
