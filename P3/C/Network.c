@@ -1,6 +1,4 @@
 #include "Network.h"
-#include "vector.h"
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -103,7 +101,22 @@ void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
     }
   }
 
-  for (int out = 0; out < net->layerSizes[net->layerCount - 1]; out++) {
-    // nambla_b[net->layerCount - 1][out] = // COST PRIME
+  double delta = 0.0;
+  double **Zs = (double **)calloc(net->layerCount, sizeof(double *));
+  for (int i = 0; i < net->layerSizes[net->layerCount - 1]; i++) {
+    for (int n = 0; n < net->layerSizes[net->layerCount - 2]; n++) {
+      Zs[net->layerCount - 1] =
+          vectorAdd(dotProduct(net->weights[net->layerCount - 1][i][n],
+                               net->layers[net->layerCount - 2][i],
+                               net->layerSizes[net->layerCount - 2]),
+                    net->biases[net->layerCount - 1][i]);
+    }
+  }
+
+  for (int l = 0; l < net->layerCount; l++) {
+    // zi = (Wi * ai-1)+ bi
+    for (int n = 0; n < net->layerCount)
+    double z = vectorAdd(dotProduct(), net->biases[][]
+    // delta = (y - y^) * sp*(zi)
   }
 }
