@@ -1,31 +1,41 @@
 #include "vector.h"
 
+#include <stdlib.h>
 
-double *vectorAdd(double *A, double *B, int n) {
-  double *out = calloc(N, sizeof(double *));
-  for (int i = 0; i < N; i++) {
+
+vec_t vectorAdd(vec_t A, vec_t B, size_t n) {
+  vec_t out = calloc(n, sizeof(double *));
+  for (int i = 0; i < n; i++) {
     out[i] = A[i] + B[i];
   }
   return out;
 }
 
-double *vectorSub(double *A, double *B, int n) {
-  double *out = calloc(N, sizeof(double *));
-  for (int i = 0; i < N; i++) {
+vec_t vectorSub(vec_t A, vec_t B, size_t n) {
+  vec_t out = calloc(n, sizeof(double *));
+  for (int i = 0; i < n; i++) {
     out[i] = A[i] - B[i];
   }
   return out;
 }
 
-double *hadamardMul(double *A, double *B, int n) {
-  double *out = calloc(N, sizeof(double *));
-  for (int i = 0; i < N; i++) {
+vec_t vectorScale(vec_t A, double s, size_t n) {
+  vec_t out = calloc(n, sizeof(double *));
+  for (int i = 0; i < n; i++) {
+    out[i] = A[i] * s;
+  }
+  return out;
+}
+
+vec_t hadamardMul(vec_t A, vec_t B, size_t n) {
+  vec_t out = calloc(n, sizeof(vec_t ));
+  for (int i = 0; i < n; i++) {
     out[i] = A[i] * B[i];
   }
   return out;
 }
     
-double dotProduct(double *A, double *B, int n) {
+double dotProduct(vec_t A, vec_t B, size_t n) {
   double result = 0.0;
   for (int i = 0; i < n; n++) {
     result += A[i] * B[i];

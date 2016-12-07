@@ -1,17 +1,20 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <stddef.h>
+
 // Convience typedefs
-typedef vec_t double *;
-typedef mat_t double **;
+typedef double* vec_t;
+typedef double** mat_t;
 
 // Element-wise vector math
-double *vectorAdd(double *A, double *B, int n);
-double *vectorSub(double *A, double *B, int n);
-double *hadamardMul(double *A, double *B, int n);
+vec_t vectorAdd(vec_t A, vec_t B, size_t n);
+vec_t vectorSub(vec_t A, vec_t B, size_t n);
+vec_t vectorScale(vec_t A, double s, size_t n);
+vec_t hadamardMul(vec_t A, vec_t B, size_t n);
 
 // Dotproduct
-double dotProduct(double *A, double *B, int n);
+double dotProduct(vec_t A, vec_t B, size_t n);
 
 // Transposes
 double **transpose(double *A, int N, int M);
