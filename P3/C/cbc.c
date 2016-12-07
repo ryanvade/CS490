@@ -18,6 +18,12 @@ double getBlobSize(int colorChannel) {
 }
 
 
+void waitForButton() {
+    while(!black_button())
+        msleep(100);
+}
+
+
 void drive(double leftSpeed, double rightSpeed) {
     motor(LEFT_MOTOR, (int)(leftSpeed * 100));
     motor(RIGHT_MOTOR, (int)(rightSpeed * 100));

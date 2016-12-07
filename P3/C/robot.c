@@ -70,6 +70,13 @@ int main(int argc, char **argv) {
 
     int behavior = ACTION_DRIVE;
 
+    // Wait for start
+    printf("Waiting for start button\n");
+    waitForButton();
+    printf("Going...");
+
+    cbcSleep(3.0);
+
     // As long as we haven't found a safe place
     while(behavior != ACTION_STOP) {
         // Capture the sensor data
@@ -80,6 +87,7 @@ int main(int argc, char **argv) {
 
         // Act on the decision of the network
         behavior = act(outputs);
+        printf("Executing action: %d\n", behavior);
 
         // Give the action time to happen
         cbcSleep(1.0);
