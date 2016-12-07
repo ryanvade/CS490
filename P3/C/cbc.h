@@ -8,8 +8,8 @@
 void cbcSleep(double time);
 
 // Sensor functions
-int getBlobSize(int colorChannel);
-int getDistance(int port);
+double getBlobSize(int colorChannel);
+double getDistance(int port);
 
 // Effector functions
 void drive(double leftSpeed, double rightSpeed);

@@ -1,18 +1,20 @@
+#include "cbc.h"
+
 void cbcSleep(double time) {
     msleep((int)(time * 1000));
 }
 
 
-int getDistance(int port){
+double getDistance(int port){
     int distance = analog10(port);
-    return distance;
+    return pow(distance, -1.34);
 }
 
 
-int getBlobSize(int colorChannel) {
+double getBlobSize(int colorChannel) {
     track_update();
     int area = track_size(colorChannel, 0);
-    return area;
+    return area / 18921.0;
 }
 
 
