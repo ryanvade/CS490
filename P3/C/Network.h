@@ -8,4 +8,7 @@ typedef struct {
   double ***weights;
 } Network;
 
+void initializeNetwork(Network *network, int numHiddenLayers, int *layerSizes);
+void forwardPropagate(Network *network, double *inputs, double *outputs);
+
 #endif

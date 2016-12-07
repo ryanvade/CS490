@@ -96,7 +96,7 @@ void deleteNetwork(Network *network) {
   free(network);
 }
 
-void forwardPropogate(Network *network, double *inputs) {
+void forwardPropagate(Network *network, double *inputs, double *outputs) {
   // set the inputs
   printf("%d", network->layerSizes[0]);
   for (int i = 0; i < network->layerSizes[0]; i++) {
@@ -113,10 +113,16 @@ void forwardPropogate(Network *network, double *inputs) {
                   network->biases[l][n]);
     }
   }
+
+  // Copy the outputs into the buffer, if it was provided
+  if(outputs != NULL)
+    for (int o = 0; o < network->layerSizes[network->layerCount - 1]; o++)
+      outputs[o] = network->layers[network->layerCount - 1][o];
+
 }
 
-void backPropogate(Network *net, double *inputs, double *expectedOutputs) {
-  forwardPropogate(net, inputs);
+void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
+  forwardPropagate(net, inputs, NULL);
   // actual outputs from the network
   double *outputs = net->layers[net->layerCount - 1];
   // Don't question NAMBLA (North American Marlon Brando Look-Alikes)
