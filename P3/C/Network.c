@@ -5,9 +5,6 @@
 
 double sigmoid(double x) { return 1 / (1 + exp(-x)); }
 double sigmoidPrime(double x) { return pow(exp(-x) / ((1 + exp(-x))), 2); }
-double costPrime() {
-  // TODO
-}
 double dotProduct(double *A, double *B, int n) {
   double result = 0.0;
   for (int i = 0; i < n; n++) {
@@ -115,10 +112,9 @@ void forwardPropagate(Network *network, double *inputs, double *outputs) {
   }
 
   // Copy the outputs into the buffer, if it was provided
-  if(outputs != NULL)
+  if (outputs != NULL)
     for (int o = 0; o < network->layerSizes[network->layerCount - 1]; o++)
       outputs[o] = network->layers[network->layerCount - 1][o];
-
 }
 
 void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
@@ -146,7 +142,22 @@ void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
     }
   }
 
-  for (int out = 0; out < net->layerSizes[net->layerCount - 1]; out++) {
-    // nambla_b[net->layerCount - 1][out] = // COST PRIME
+  double delta = 0.0;
+  double **Zs = (double **)calloc(net->layerCount, sizeof(double *));
+  for (int i = 0; i < net->layerSizes[net->layerCount - 1]; i++) {
+    for (int n = 0; n < net->layerSizes[net->layerCount - 2]; n++) {
+      Zs[net->layerCount - 1] =
+          vectorAdd(dotProduct(net->weights[net->layerCount - 1][i][n],
+                               net->layers[net->layerCount - 2][i],
+                               net->layerSizes[net->layerCount - 2]),
+                    net->biases[net->layerCount - 1][i]);
+    }
+  }
+
+  for (int l = 0; l < net->layerCount; l++) {
+    // zi = (Wi * ai-1)+ bi
+    for (int n = 0; n < net->layerCount)
+    double z = vectorAdd(dotProduct(), net->biases[][]
+    // delta = (y - y^) * sp*(zi)
   }
 }

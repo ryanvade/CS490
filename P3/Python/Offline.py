@@ -2,35 +2,29 @@ import numpy as np
 from scipy import optimize
 
 class Network(object):
-    def __init__(self):
-        self.inputLayerSize = 8
-        self.outputLayerSize = 2
-        self.hiddenLayerSize = 4
+    def __init__(self, inputLayerSize, outputLayerSize, hiddenLayerSize, numberHiddenLayers):
+        self.inputLayerSize = inputLayerSize
+        self.outputLayerSize = outputLayerSize
+        self.hiddenLayerSize = hiddenLayerSize
+        self.numberHiddenLayers = numberHiddenLayers
+        self.weights = []
+        self.biases = []
 
-        self.W0 = np.random.randn(self.inputLayerSize, self.hiddenLayerSize)
-        self.W1 = np.random.randn(self.hiddenLayerSize, self.hiddenLayerSize)
-        self.W2 = np.random.randn(self.hiddenLayerSize, self.hiddenLayerSize)
-        self.W3 = np.random.randn(self.hiddenLayerSize, self.outputLayerSize)
+        self.sizes = [self.inputLayerSize]
+        for l in range(self.numberHiddenLayers):
+            self.sizes.append(self.hiddenLayerSize)
+        self.sizes.append(self.outputLayerSize)
+
+        for y in self.sizes[1:]:
+            self.biases.append(np.random.randn(y, 1))
+
+        for x, y in zip(self.sizes[:-1], self.sizes[1:]):
+            self.weights.append(np.random.randn(y, x))
 
     def forwardPropogate(self, inputValues):
-        # z0 = x0*W0
-        self.z0 = np.dot(inputValues, self.W0)
-        # a0 = activationFunction(z0)
-        self.a0 = self.sigmoid(self.z0)
-        # z1 = x1*w1
-        self.z1 = np.dot(self.a0, self.W1)
-        # a1 = activationFunction(z1)
-        self.a1 = self.sigmoid(self.z1)
-        # z2 = x2*w2
-        self.z2 = np.dot(self.a1, self.W2)
-        # a2 = activationFunction(z2)
-        self.a2 = self.sigmoid(self.z2)
-        #z3 = x3 * w3
-        self.z3 = np.dot(self.a2, self.W3)
-        #a3 (output Estimate) = activationFunction(z3)
-        self.a3 = self.sigmoid(self.z3)
-        outputEstimate = self.sigmoid(self.z3)
-        return outputEstimate
+        for b, w in zip(self.biases, self.weights):
+            a = self.sigmoid(np.dot(w, inputValues)+b)
+        return a
 
     def sigmoid(self, Z):
         return 1/(1+np.exp(-Z))
@@ -39,6 +33,8 @@ class Network(object):
         return np.exp(-Z)/((1+np.exp(-Z))**2)
 
     def cost(self, inputValues, output):
+        print("input", inputValues)
+        print("output", output)
         self.outputEstimate = self.forwardPropogate(inputValues)
         # Cost = (1/2 * # inputs (# training samples)) * SUM OF (h(x) - output)^2
         # h(x) in this case is the actual output
@@ -50,6 +46,7 @@ class Network(object):
 
         # error
         delta4 = np.multiply(-(output - self.outputEstimate), self.sigmoidPrime(self.z3))
+        print("Stuff", self.a2.T, delta4);
         # derivative of cost with respect to weight
         dcdw3 = np.dot(self.a2.T, delta4)
 
@@ -120,7 +117,7 @@ class RobotTrainer(object):
         self.network.setWeights(weights)
         print("Weights:")
         print(weights)
-        j = self.network.cost(self.inputValues, self.output)
+        j = self.network.cost(self.inputValues[self.epoch], self.output[self.epoch])
         print("Cost:")
         print(j)
         self.cost.append(j)
@@ -154,19 +151,9 @@ class RobotTrainer(object):
         weights = self.network.getWeights()
 
         options = {'maxiter': 1, 'disp' : True}
-        _res = optimize.minimize(self.costFunction, weights, jac=True, method='BFGS', \
-                                 args=(inputValues, output), options=options, callback=self.callback)
+        for epoch in range(len(inputValues)):
+            self.epoch = epoch;
+            _res = optimize.minimize(self.costFunction, weights, args=(inputValues[epoch], output[epoch]), method='BFGS', jac=True)
+            self.network.setWeights(_res.x)
 
-        self.network.setWeights(_res.x)
-        self.optimizationResults = _res
-
-
-trainingInput = np.array(([0,1, 2, 3, 4, 5, 6, 7], [8, 9, 10, 11, 12, 13,14, 15], [16, 17, 18, 19, 20, 21, 22, 23]), dtype=float)
-trainingOutput = np.array(([0,1], [2,3], [4, 5]), dtype=float)
-
-# trainingInput = trainingInput/np.amax(trainingInput, axis=0)
-# trainingOutput = trainingOutput/5
-
-network = Network()
-robotTrainer = RobotTrainer(network)
-robotTrainer.run(trainingInput, trainingOutput)
+        print(_res.x)
