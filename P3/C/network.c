@@ -1,4 +1,4 @@
-#include "Network.h"
+#include "network.h"
 #include "vector.h"
 #include <math.h>
 #include <stdio.h>
@@ -123,7 +123,7 @@ void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
     for (int n = 0; n < net->layerSizes[i]; n++) {
       sigmoids[n] = sigmoidPrime(net->weightedSums[i][n]);
     }
-    d = dotProduct(deltas, net->weights[i][]);
-    deltas = vectorSub(deltas, d, net->layerSizes[i + 1]);
+    //d = dotProduct(deltas, net->weights[i][]);
+    //deltas = vectorSub(deltas, d, net->layerSizes[i + 1]);
   }
 }

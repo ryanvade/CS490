@@ -1,5 +1,5 @@
 #include "cbc.h"
-#include "Network.h"
+#include "network.h"
 
 #include <stdio.h>
 

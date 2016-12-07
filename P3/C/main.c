@@ -1,4 +1,4 @@
-#include "Network.h"
+#include "network.h"
 #include "vector.h"
 
 #include <stdio.h>
