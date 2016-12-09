@@ -63,7 +63,7 @@ void forwardPropagate(Network *network, double *inputs, double *outputs) {
   // for every bias and weight in the network
   // add the sigmoid of dot product between weights, inputs + b
   for (int l = 1; l < network->layerCount; l++) {
-    for (int n = 0; n < network->layerSizes[n]; n++) {
+    for (int n = 0; n < network->layerSizes[l]; n++) {
       network->weightedSums[l][n] =
           dotProduct(network->weights[l][n], network->layers[l - 1],
                      network->layerSizes[l - 1]) +
