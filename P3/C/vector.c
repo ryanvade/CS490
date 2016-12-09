@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 
-
 vec_t vectorAdd(vec_t A, vec_t B, size_t n) {
   vec_t out = calloc(n, sizeof(double *));
   for (int i = 0; i < n; i++) {
@@ -28,20 +27,18 @@ vec_t vectorScale(vec_t A, double s, size_t n) {
 }
 
 vec_t hadamardMul(vec_t A, vec_t B, size_t n) {
-  vec_t out = calloc(n, sizeof(vec_t ));
+  vec_t out = calloc(n, sizeof(vec_t));
   for (int i = 0; i < n; i++) {
     out[i] = A[i] * B[i];
   }
   return out;
 }
-    
+
 double dotProduct(vec_t A, vec_t B, size_t n) {
   double result = 0.0;
-  for (int i = 0; i < n; n++) {
+  for (int i = 0; i < n; i++) {
     result += A[i] * B[i];
-    // printf("%f * %f = %f\n", A[i], B[i], A[i] * B[i]);
   }
-  // printf("\n");
   return result;
 }
 
@@ -90,4 +87,3 @@ vec_t matrixTimesVector(mat_t matrix, vec_t vector, size_t n, size_t m) {
   }
   return out;
 }
-

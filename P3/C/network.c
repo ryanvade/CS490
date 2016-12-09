@@ -118,7 +118,6 @@ void backPropagate(Network *net, double *inputs, double *expectedOutputs,
       hadamardMul(deltas, net->layers[net->layerCount - 2],
                   net->layerSizes[net->layerCount - 2]);
 
-  sigmoids = NULL;
   // add nambla_b and nambla_w for all the other layers
   for (int i = net->layerCount - 2; i > 0; i--) {
     for (int n = 0; n < net->layerSizes[i]; n++) {
