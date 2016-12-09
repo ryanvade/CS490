@@ -4,8 +4,8 @@
 #include <stddef.h>
 
 // Convience typedefs
-typedef double* vec_t;
-typedef double** mat_t;
+typedef double *vec_t;
+typedef double **mat_t;
 
 // Element-wise vector math
 vec_t vectorAdd(vec_t A, vec_t B, size_t n);
@@ -24,4 +24,3 @@ double ***transpose3D(double ***A, int N, int M, int O);
 vec_t matrixTimesVector(mat_t, vec_t, size_t m, size_t n);
 
 #endif
-

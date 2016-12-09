@@ -78,7 +78,8 @@ void forwardPropagate(Network *network, double *inputs, double *outputs) {
       outputs[o] = network->layers[network->layerCount - 1][o];
 }
 
-void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
+void backPropagate(Network *net, double *inputs, double *expectedOutputs,
+                   double alpha) {
   forwardPropagate(net, inputs, NULL);
   // actual outputs from the network
   double *outputs = net->layers[net->layerCount - 1];
@@ -118,13 +119,26 @@ void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
                   net->layerSizes[net->layerCount - 2]);
 
   sigmoids = NULL;
-  double d;
+  // add nambla_b and nambla_w for all the other layers
   for (int i = net->layerCount - 2; i > 0; i--) {
     for (int n = 0; n < net->layerSizes[i]; n++) {
       sigmoids[n] = sigmoidPrime(net->weightedSums[i][n]);
     }
-    deltas = matrixTimesVector(net->weights[i + 1], deltas);
-    //d = dotProduct(deltas, net->weights[i][]);
-    //deltas = vectorSub(deltas, d, net->layerSizes[i + 1]);
+    deltas = matrixTimesVector(net->weights[i + 1], deltas,
+                               net->layerSizes[i + 1], net->layerSizes[i]);
+    deltas = hadamardMul(deltas, sigmoids, net->layerSizes[i]);
+    nambla_b[i] = deltas;
+    nambla_w[i] = matrixTimesVector(
+        transpose(net->layers[i], net->layerSizes[i], net->layerSizes[i]),
+        deltas, net->layerSizes[i], net->layerSizes[i + 1]);
+  }
+  // update the weights and biases
+  for (int l = 0; l < net->layerCount; l++) {
+    for (int n = 0; n < net->layerSizes[l]; n++) {
+      // not including the alpha
+      net->weights[l][n] =
+          vectorSub(net->weights[l][n], nambla_w[l], net->layerSizes[l]);
+    }
+    net->biases[l] = vectorSub(net->biases[l], nambla_b[l], net->layerSizes[l]);
   }
 }

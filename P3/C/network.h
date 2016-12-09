@@ -12,5 +12,7 @@ typedef struct {
 
 void initializeNetwork(Network *network, int numHiddenLayers, int *layerSizes);
 void forwardPropagate(Network *network, double *inputs, double *outputs);
+void backPropagate(Network *net, double *inputs, double *expectedOutputs,
+                   double alpha);
 
 #endif
