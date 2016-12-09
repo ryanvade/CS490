@@ -123,6 +123,7 @@ void backPropagate(Network *net, double *inputs, double *expectedOutputs) {
     for (int n = 0; n < net->layerSizes[i]; n++) {
       sigmoids[n] = sigmoidPrime(net->weightedSums[i][n]);
     }
+    deltas = matrixTimesVector(net->weights[i + 1], deltas);
     //d = dotProduct(deltas, net->weights[i][]);
     //deltas = vectorSub(deltas, d, net->layerSizes[i + 1]);
   }

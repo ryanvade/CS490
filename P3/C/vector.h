@@ -21,5 +21,7 @@ double **transpose(double *A, int N, int M);
 double **transpose2D(double **A, int N, int M);
 double ***transpose3D(double ***A, int N, int M, int O);
 
+vec_t matrixTimesVector(mat_t, vec_t, size_t m, size_t n);
+
 #endif
 

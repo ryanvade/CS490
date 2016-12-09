@@ -80,3 +80,14 @@ double ***transpose3D(double ***A, int N, int M, int O) {
   }
   return out;
 }
+
+vec_t matrixTimesVector(mat_t matrix, vec_t vector, size_t n, size_t m) {
+  vec_t out = (double *)calloc(m, sizeof(double *));
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      out[i] += matrix[j][i] * vector[j];
+    }
+  }
+  return out;
+}
+
