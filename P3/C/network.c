@@ -123,16 +123,16 @@ void backPropagate(Network *net, double *inputs, double *expectedOutputs,
     for (int n = 0; n < net->layerSizes[i]; n++) {
       sigmoids[n] = sigmoidPrime(net->weightedSums[i][n]);
     }
-    deltas = matrixTimesVector(net->weights[i + 1], deltas,
-                               net->layerSizes[i + 1], net->layerSizes[i]);
+    deltas = matrixTimesVector(net->weights[i], deltas, net->layerSizes[i],
+                               net->layerCount - 1);
     deltas = hadamardMul(deltas, sigmoids, net->layerSizes[i]);
     nambla_b[i] = deltas;
     nambla_w[i] = matrixTimesVector(
         transpose(net->layers[i], net->layerSizes[i], net->layerSizes[i]),
-        deltas, net->layerSizes[i], net->layerSizes[i + 1]);
+        deltas, net->layerSizes[i], net->layerSizes[i]);
   }
   // update the weights and biases
-  for (int l = 0; l < net->layerCount; l++) {
+  for (int l = 1; l < net->layerCount; l++) {
     for (int n = 0; n < net->layerSizes[l]; n++) {
       // not including the alpha
       net->weights[l][n] =
