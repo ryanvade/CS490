@@ -55,10 +55,8 @@ void deleteNetwork(Network *network) {
 
 void forwardPropagate(Network *network, double *inputs, double *outputs) {
   // set the inputs
-  printf("%d", network->layerSizes[0]);
   for (int i = 0; i < network->layerSizes[0]; i++) {
     network->layers[0][i] = inputs[i];
-    printf("0 %f ", network->layers[0][i]);
   }
   // for every bias and weight in the network
   // add the sigmoid of dot product between weights, inputs + b
