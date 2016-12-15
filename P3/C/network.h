@@ -11,6 +11,7 @@ typedef struct {
 } Network;
 
 void initializeNetwork(Network *network, int numHiddenLayers, int *layerSizes);
+void printWeights(Network *network);
 void forwardPropagate(Network *network, double *inputs, double *outputs);
 void backPropagate(Network *net, double *inputs, double *expectedOutputs,
                    double alpha);

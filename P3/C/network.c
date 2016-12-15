@@ -53,6 +53,13 @@ void deleteNetwork(Network *network) {
   free(network);
 }
 
+void printWeights(Network *network) {
+    for(int l = 1; l < network->layerCount; l++)
+        for(int n = 0; n < network->layerSizes[l]; n++)
+            for(int w = 0; w < network->layerSizes[l-1]; w++)
+                printf("%f \n", network->weights[l][n][w]);
+}
+
 void forwardPropagate(Network *network, double *inputs, double *outputs) {
   // set the inputs
   for (int i = 0; i < network->layerSizes[0]; i++) {
